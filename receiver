@@ -1,0 +1,68 @@
+#include <RH_ASK.h>
+#include <SPI.h>
+
+#define RED_LED    2
+#define YELLOW_LED 3
+#define BLUE_LED   4
+#define GREEN_LED  5
+
+RH_ASK rf_driver;
+char received_command;
+
+void setup() {
+  pinMode(RED_LED, OUTPUT);
+  pinMode(YELLOW_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+
+  Serial.begin(9600);
+  if (!rf_driver.init()) {
+    Serial.println("RF Receiver Initialization Failed");
+    while (1);
+  }
+  Serial.println("Receiver ready. Waiting for commands...");
+}
+
+void loop() {
+  if (rf_driver.available()) {
+    uint8_t buf[1];
+    uint8_t len = sizeof(buf);
+
+    if (rf_driver.recv(buf, &len)) {
+      received_command = buf[0];
+      Serial.print("Received: ");
+      Serial.println(received_command);
+
+      if (received_command == 'R') {
+        digitalWrite(RED_LED, HIGH);
+        digitalWrite(YELLOW_LED, LOW);
+        digitalWrite(BLUE_LED, LOW);
+        digitalWrite(GREEN_LED, LOW);
+      }
+      else if (received_command == 'Y') {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(YELLOW_LED, HIGH);
+        digitalWrite(BLUE_LED, LOW);
+        digitalWrite(GREEN_LED, LOW);
+      }
+      else if (received_command == 'B') {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(YELLOW_LED, LOW);
+        digitalWrite(BLUE_LED, HIGH);
+        digitalWrite(GREEN_LED, LOW);
+      }
+      else if (received_command == 'G') {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(YELLOW_LED, LOW);
+        digitalWrite(BLUE_LED, LOW);
+        digitalWrite(GREEN_LED, HIGH);
+      }
+      else if (received_command == 'S') {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(YELLOW_LED, LOW);
+        digitalWrite(BLUE_LED, LOW);
+        digitalWrite(GREEN_LED, LOW);
+      }
+    }
+  }
+}
