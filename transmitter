@@ -1,0 +1,57 @@
+
+---
+
+## 🛠 Components & Functions
+1. **Arduino Nano (x2)** → Controls TX and RX sides.  
+2. **RF Modules (TX & RX)** → Handle wireless communication.  
+3. **LEDs (4 actuators)** → Represent pneumatic actuators.  
+4. **Power Supply** → 12V or USB.  
+5. **Serial Monitor** → Debugging and monitoring signals.  
+6. **Ground (GND)** → Common ground reference.  
+
+---
+
+## 📜 Algorithms
+
+### 🔼 Transmission (Arduino 1)
+1. Initialize RF TX & Serial Monitor.  
+2. Wait for user input (commands).  
+3. Send command via RF module.  
+4. Print confirmation on Serial Monitor.  
+
+### 🔽 Reception (Arduino 2)
+1. Initialize RF RX & Serial Monitor.  
+2. Wait for incoming data.  
+3. Decode received command.  
+4. Control respective LED actuator.  
+
+---
+
+## 💡 Transmitter Code (Remote)
+
+```cpp
+#include <RH_ASK.h>
+#include <SPI.h>
+
+RH_ASK rf_driver;
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("RF Transmitter Ready. Enter commands:");
+  rf_driver.init();
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    char command = Serial.read();
+
+    rf_driver.send((uint8_t *)&command, sizeof(command));
+    rf_driver.waitPacketSent();
+
+    if (command == 'R') Serial.println("Sent: Red LED ON");
+    else if (command == 'Y') Serial.println("Sent: Yellow LED ON");
+    else if (command == 'B') Serial.println("Sent: Blue LED ON");
+    else if (command == 'G') Serial.println("Sent: Green LED ON");
+    else if (command == 'S') Serial.println("Sent: Stop All LEDs");
+  }
+}
